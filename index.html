@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Formula Heat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+    }
+
+    header {
+      background: #000;
+      padding: 10px 15px;
+      text-align: center;
+    }
+
+    header img {
+      height: 60px;
+      max-width: 90%;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .carousel-container {
+      width: 100%;
+      overflow: hidden;
+      background: #1c1c1c;
+      position: relative;
+      z-index: 10;
+    }
+
+    .carousel-slide {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 10px;
+    }
+
+    .carousel-slide.active {
+      display: flex;
+    }
+
+    .carousel-card {
+      position: relative;
+      width: 100%;
+      max-width: 100%;
+      display: flex;
+      transition: transform 0.6s;
+      transform-style: preserve-3d;
+      z-index: 15;
+    }
+
+    .carousel-face,
+    .carousel-back {
+      backface-visibility: hidden;
+      width: 100%;
+    }
+
+    .carousel-face {
+      display: flex;
+      flex-direction: row;
+    }
+
+    .carousel-back {
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: rotateY(180deg);
+      background: #1c1c1c;
+      padding: 20px;
+      border-radius: 8px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .carousel-card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .carousel-slide img {
+      width: 40vw;
+      max-width: 250px;
+      height: 375px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    .carousel-text {
+      flex: 1;
+      padding-left: 20px;
+      overflow-y: auto;
+      max-height: 220px;
+    }
+
+    .carousel-text h2 {
+      margin-top: 0;
+      font-size: 20px;
+    }
+
+    .carousel-text p {
+      font-size: 14px;
+      color: #aaa;
+    }
+
+    .carousel-dots {
+      text-align: center;
+      margin: 15px 0;
+      position: relative;
+      z-index: 20;
+    }
+
+    .carousel-dots .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      margin: 0 4px;
+      background-color: #555;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .carousel-dots .dot.active {
+      background-color: #fff;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin: 30px 0 20px 0;
+      color: #fff;
+    }
+
+    .ranking-list {
+      padding: 0 15px;
+      margin-top: 30px;
+      position: relative;
+      z-index: 5;
+    }
+
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .ranking-item span {
+      flex: 1;
+      text-align: center;
+    }
+
+    .ranking-item span:first-child {
+      text-align: left;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .gp-carousel-container {
+      padding: 20px 0;
+      overflow-x: auto;
+      white-space: nowrap;
+      position: relative;
+      z-index: 5;
+    }
+
+    .gp-carousel-wrapper {
+      display: flex;
+      gap: 10px;
+      padding: 0 15px;
+    }
+
+    .gp-carousel-slide {
+      display: inline-block;
+      background: #1c1c1c;
+      width: 80vw;
+      max-width: 300px;
+      flex-shrink: 0;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .gp-title {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .gp-ranking-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 14px;
+      border: 2px solid transparent;
+    }
+
+    .gp-ranking-item.gold { border-color: gold; }
+    .gp-ranking-item.silver { border-color: silver; }
+    .gp-ranking-item.bronze { border-color: peru; }
+
+    .gp-ranking-item span {
+      flex: 1;
+      text-align: center;
+    }
+
+    .gp-ranking-item span:first-child {
+      text-align: left;
+    }
+    
+  @media (max-width: 600px) {
+    .carousel-container {
+      min-height: 450px;
+      z-index: 100;
+    }
+
+    .carousel-slide {
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 101;
+    }
+
+    .carousel-card {
+      width: 90vw;
+      height: 400px;
+      transform-style: preserve-3d;
+      transition: transform 0.6s;
+      perspective: 1000px;
+      position: relative;
+      z-index: 102;
+    }
+
+    .carousel-face, .carousel-back {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      backface-visibility: hidden;
+      top: 0;
+      left: 0;
+      padding: 0;
+      border-radius: 10px;
+      z-index: 103;
+    }
+
+    .carousel-face {
+      transform: rotateY(0deg);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .carousel-back {
+      transform: rotateY(180deg);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #1a1a1a;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .carousel-card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .carousel-slide img {
+      width: 100%;
+      height: 100%;
+      max-height: 400px;
+      object-fit: cover;
+      display: block;
+      border-radius: 10px;
+    }
+
+    .carousel-text {
+      display: none;
+    }
+
+    .carousel-text-mobile {
+      font-size: 14px;
+      color: #ccc;
+      text-align: center;
+    }
+
+    .carousel-dots {
+      z-index: 104;
+      position: relative;
+    }
+
+    .ranking-list {
+      z-index: 1;
+      position: relative;
+    }
+
+    .gp-carousel-container {
+      z-index: 1;
+      position: relative;
+    }
+  }
+
+  </style>
+</head>
+<body>
+  <header>
+    <img src="assets/logo.png" alt="Formula Heat" />
+  </header>
+
+  <div class="container">
+    <div class="carousel-container">
+      <div id="carouselSlides"></div>
+      <div class="carousel-dots" id="carouselDots"></div>
+    </div>
+
+    <div class="section-title">F🔥 25/26 Championship</div>
+    <div class="ranking-list" id="rankingList"></div>
+
+    <div class="section-title">GP Standings</div>
+    <div class="gp-carousel-container">
+      <div class="gp-carousel-wrapper" id="gpCarouselWrapper"></div>
+    </div>
+  </div>
+
+  <script>
+    const pilots = [
+      { number: 3, name: "Vix", points: 0, image: "assets/vix.jpeg", color: "#BD391F", description: "Vix (Francesco Virgulì) è il nome del momento nel mondo delle corse. Giovane, carismatico e incredibilmente veloce, è considerato l'astro nascente della categoria. In pista combina istinto e tecnica con una maturità sorprendente, mentre fuori dai circuiti conquista fan e addetti ai lavori con il suo stile e la sua sicurezza. Ogni gara è un'occasione per confermare il suo talento e alzare l'asticella. Per molti è già una stella; per altri, è il futuro che è già arrivato." },
+      { number: 2, name: "Andrea", points: 0, image: "assets/andy.jpeg", color: "#ABAAAA", description: "Andrea è un pilota esperto, con alle spalle una lunga carriera nel mondo delle corse. Dopo anni trascorsi ai vertici e momenti di grande successo, il suo percorso ha conosciuto anche fasi difficili. Nonostante non sia più sotto i riflettori come un tempo, Andrea non ha mai perso la determinazione. Oggi è spinto da un unico obiettivo: tornare competitivo e dimostrare di avere ancora molto da dare. La sua esperienza, unita a una grinta che non si è mai spenta, lo rende un avversario da non sottovalutare." },
+      { number: 14, name: "Nicole", points: 0, image: "assets/niki.jpeg", color: "#F9DA44", description: "Nicole è una pilota dal sangue freddo, precisa e implacabile. Il suo stile di guida è calcolato al millimetro: ogni sorpasso, ogni traiettoria, ogni frenata è frutto di una strategia lucida e ben studiata. Non è la più appariscente in pista, ma è tra le più efficaci. Difficilmente commette errori, e quando lo fa, è raro che accada due volte. Nicole non lascia nulla al caso — e proprio per questo, è temuta da chiunque si trovi a correre contro di lei." },
+      { number: 9, name: "Federica", points: 0, image: "assets/fede.jpeg", color: "#65517E", description: "Federica è una pilota cresciuta a pane senza glutine e motori, figlia d'arte con il rombo nel sangue. Ha iniziato a correre giovanissima e ha dominato i campionati minori con talento e costanza. Dopo anni di vittorie e podi, è pronta a fare il salto tra i professionisti, dove sa che ogni curva sarà una prova di maturità. Determinata e preparata, non cerca scorciatoie: vuole guadagnarsi tutto con il lavoro, la passione e la velocità che l'hanno sempre distinta." },
+      { number: 10, name: "Lavinia", points: 0, image: "assets/lavi.jpeg", color: "#173167", description: "Lavinia è una delle nuove promesse del mondo delle corse. Ha iniziato da poco, ma ha già attirato l'attenzione per la sua tenacia e la rapidità di apprendimento. Il suo passato da atleta nelle arti marziali le ha donato riflessi fulminei, disciplina e una resistenza fuori dal comune. Anche se l'esperienza non è ancora dalla sua parte, ha tutte le carte in regola per crescere in fretta e puntare in alto. Lavinia non si tira indietro: affronta ogni gara come un duello da vincere." },
+      { number: 5, name: "Monte", points: 0, image: "assets/monte.jpeg", color: "#439851", description: "Alessandro Monte(verdi) è uno dei volti più amati del paddock: simpatico, socievole, sempre pronto a scherzare e a creare un buon clima attorno a sé. Ma quando abbassa la visiera, tutto cambia. In pista diventa freddo, determinato e spietato, capace di trasformarsi in un avversario durissimo da battere. Questa doppia anima – affabile fuori, implacabile dentro – è ciò che lo rende unico e irresistibile, sia per il pubblico che per chi con lui condivide il tracciato." },
+      { number: 7, name: "Mauro", points: 0, image: "assets/mauro.jpeg", color: "#222", description: "Mauro è un pilota dal talento naturale, conosciuto per il suo stile di guida aggressivo e senza compromessi. In pista è istintivo, veloce e spesso al limite, qualità che gli hanno valso tanto ammirazione quanto critiche. Ogni gara per lui è una sfida da affrontare a viso aperto, senza paura. A volte la sua audacia lo porta a rischiare più del necessario, ma quando tutto va per il verso giusto, è capace di prestazioni straordinarie. Mauro non si accontenta di partecipare: corre per vincere, sempre." }
+    ];
+
+    const gps = [
+      { gp: "USA", ranking: ["-", "-", "-", "-", "-", "-", "-"] },
+      { gp: "Mexico", ranking: ["-", "-", "-", "-", "-", "-", "-"] },
+      { gp: "Holland", ranking: ["-", "-", "-", "-", "-", "-", "-"] },
+      { gp: "France", ranking: ["-", "-", "-", "-", "-", "-", "-"] },
+      { gp: "Japan", ranking: ["-", "-", "-", "-", "-", "-", "-"] },
+      { gp: "UK", ranking: ["-", "-", "-", "-", "-", "-", "-"] },
+      { gp: "Spain", ranking: ["-", "-", "-", "-", "-", "-", "-"] },
+      { gp: "Italy", ranking: ["-", "-", "-", "-", "-", "-", "-"] }
+    ];
+
+    // Sort pilots by points descending
+    const sortedPilots = [...pilots].sort((a, b) => {
+      return b.points - a.points;
+    });
+
+    // Populate Carousel
+    const carouselSlides = document.getElementById("carouselSlides");
+    const carouselDots = document.getElementById("carouselDots");
+    const rankingList = document.getElementById("rankingList");
+
+    sortedPilots.forEach((pilot, i) => {
+      const slide = document.createElement("div");
+      slide.className = `carousel-slide${i === 0 ? " active" : ""}`;
+      slide.innerHTML = `
+        <div class="carousel-card" onclick="handleFlip(this)">
+          <div class="carousel-face">
+            <img src="${pilot.image}" alt="${pilot.name}" />
+            <div class="carousel-text">
+              <h2>${pilot.name}</h2>
+              <p>${pilot.description}</p>
+            </div>
+          </div>
+          <div class="carousel-back">
+            <h2>${pilot.name}</h2>
+            <p>${pilot.description}</p>
+          </div>
+        </div>
+      `;
+      carouselSlides.appendChild(slide);
+
+      const dot = document.createElement("span");
+      dot.className = `dot${i === 0 ? " active" : ""}`;
+      dot.addEventListener("click", () => showSlide(i));
+      carouselDots.appendChild(dot);
+
+      const row = document.createElement("div");
+      row.className = "ranking-item";
+      row.style.backgroundColor = pilot.color;
+      row.innerHTML = `<span>${pilot.number}</span><span>${pilot.name}</span><span>${pilot.points}</span>`;
+      rankingList.appendChild(row);
+    });
+
+    let currentSlide = 0;
+    const slides = document.querySelectorAll(".carousel-slide");
+    const dots = document.querySelectorAll(".carousel-dots .dot");
+
+    function showSlide(i) {
+      slides.forEach((slide, idx) => {
+        slide.classList.toggle("active", idx === i);
+      });
+      dots.forEach((dot, idx) => {
+        dot.classList.toggle("active", idx === i);
+      });
+      currentSlide = i;
+    }
+
+    setInterval(() => {
+      currentSlide = (currentSlide + 1) % slides.length;
+      showSlide(currentSlide);
+    }, 10000);
+
+    function handleFlip(card) {
+      if (window.innerWidth <= 600) {
+        card.classList.toggle("flipped");
+      }
+    }
+
+    const gpWrapper = document.getElementById("gpCarouselWrapper");
+
+    gps.forEach(gp => {
+      const div = document.createElement("div");
+      div.className = "gp-carousel-slide";
+
+      let html = `<div class="gp-title">${gp.gp} GP</div>`;
+      gp.ranking.forEach((name, i) => {
+        const medal = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
+        html += `<div class="gp-ranking-item ${medal}"><span>${i + 1}</span><span>${name}</span><span></span></div>`;
+      });
+
+      div.innerHTML = html;
+      gpWrapper.appendChild(div);
+    });
+  </script>
+</body>
+</html>
