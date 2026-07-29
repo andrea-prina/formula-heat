@@ -28,6 +28,30 @@
       margin: 0 auto;
     }
 
+    .year-switcher {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0 10px;
+    }
+
+    .year-button {
+      background: #1c1c1c;
+      border: 2px solid #555;
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .year-button.active {
+      background: #fff;
+      color: #111;
+      border-color: #fff;
+    }
+
     .carousel-container {
       width: 100%;
       overflow: hidden;
@@ -222,99 +246,98 @@
     .gp-ranking-item span:first-child {
       text-align: left;
     }
-    
-  @media (max-width: 600px) {
-    .carousel-container {
-      min-height: 450px;
-      z-index: 100;
-    }
 
-    .carousel-slide {
-      flex-direction: column;
-      align-items: center;
-      position: relative;
-      z-index: 101;
-    }
+    @media (max-width: 600px) {
+      .carousel-container {
+        min-height: 450px;
+        z-index: 100;
+      }
 
-    .carousel-card {
-      width: 90vw;
-      height: 400px;
-      transform-style: preserve-3d;
-      transition: transform 0.6s;
-      perspective: 1000px;
-      position: relative;
-      z-index: 102;
-    }
+      .carousel-slide {
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 101;
+      }
 
-    .carousel-face, .carousel-back {
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      backface-visibility: hidden;
-      top: 0;
-      left: 0;
-      padding: 0;
-      border-radius: 10px;
-      z-index: 103;
-    }
+      .carousel-card {
+        width: 90vw;
+        height: 400px;
+        transform-style: preserve-3d;
+        transition: transform 0.6s;
+        perspective: 1000px;
+        position: relative;
+        z-index: 102;
+      }
 
-    .carousel-face {
-      transform: rotateY(0deg);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+      .carousel-face, .carousel-back {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        backface-visibility: hidden;
+        top: 0;
+        left: 0;
+        padding: 0;
+        border-radius: 10px;
+        z-index: 103;
+      }
 
-    .carousel-back {
-      transform: rotateY(180deg);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background: #1a1a1a;
-      padding: 20px;
-      box-sizing: border-box;
-    }
+      .carousel-face {
+        transform: rotateY(0deg);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
-    .carousel-card.flipped {
-      transform: rotateY(180deg);
-    }
+      .carousel-back {
+        transform: rotateY(180deg);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: #1a1a1a;
+        padding: 20px;
+        box-sizing: border-box;
+      }
 
-    .carousel-slide img {
-      width: 100%;
-      height: 100%;
-      max-height: 400px;
-      object-fit: cover;
-      display: block;
-      border-radius: 10px;
-    }
+      .carousel-card.flipped {
+        transform: rotateY(180deg);
+      }
 
-    .carousel-text {
-      display: none;
-    }
+      .carousel-slide img {
+        width: 100%;
+        height: 100%;
+        max-height: 400px;
+        object-fit: cover;
+        display: block;
+        border-radius: 10px;
+      }
 
-    .carousel-text-mobile {
-      font-size: 14px;
-      color: #ccc;
-      text-align: center;
-    }
+      .carousel-text {
+        display: none;
+      }
 
-    .carousel-dots {
-      z-index: 104;
-      position: relative;
-    }
+      .carousel-text-mobile {
+        font-size: 14px;
+        color: #ccc;
+        text-align: center;
+      }
 
-    .ranking-list {
-      z-index: 1;
-      position: relative;
-    }
+      .carousel-dots {
+        z-index: 104;
+        position: relative;
+      }
 
-    .gp-carousel-container {
-      z-index: 1;
-      position: relative;
-    }
-  }
+      .ranking-list {
+        z-index: 1;
+        position: relative;
+      }
 
+      .gp-carousel-container {
+        z-index: 1;
+        position: relative;
+      }
+    }
   </style>
 </head>
 <body>
@@ -323,12 +346,17 @@
   </header>
 
   <div class="container">
+    <div class="year-switcher">
+      <button class="year-button active" data-year="2026-2027">2026-2027</button>
+      <button class="year-button" data-year="2025-2026">2025-2026</button>
+    </div>
+
     <div class="carousel-container">
       <div id="carouselSlides"></div>
       <div class="carousel-dots" id="carouselDots"></div>
     </div>
 
-    <div class="section-title">F🔥 2k26 Championship</div>
+    <div class="section-title" id="seasonTitle"></div>
     <div class="ranking-list" id="rankingList"></div>
 
     <div class="section-title">GP Standings</div>
@@ -338,71 +366,66 @@
   </div>
 
   <script>
-    const pilots = [
-      { number: 3, name: "Vix", points: 27, image: "assets/vix.jpeg", color: "#BD391F", description: "Vix (Francesco Virgolini) è il nome del momento nel mondo delle corse. Giovane, carismatico e incredibilmente veloce, è considerato l'astro nascente della categoria. In pista combina istinto e tecnica con una maturità sorprendente, mentre fuori dai circuiti conquista fan e addetti ai lavori con il suo stile e la sua sicurezza. Ogni gara è un'occasione per confermare il suo talento e alzare l'asticella. Per molti è già una stella; per altri, è il futuro che è già arrivato." },
-      { number: 2, name: "Andy", points: 33, image: "assets/andy.jpeg", color: "#ABAAAA", description: "Andy è un pilota esperto, con alle spalle una lunga carriera nel mondo delle corse. Dopo anni trascorsi ai vertici e momenti di grande successo, il suo percorso ha conosciuto anche fasi difficili. Nonostante non sia più sotto i riflettori come un tempo, Andy non ha mai perso la determinazione. Oggi è spinto da un unico obiettivo: tornare competitivo e dimostrare di avere ancora molto da dare. La sua esperienza, unita a una grinta che non si è mai spenta, lo rende un avversario da non sottovalutare." },
-      { number: 14, name: "Niki", points: 15, image: "assets/niki.jpeg", color: "#F9DA44", description: "Niki è una pilota dal sangue freddo, precisa e implacabile. Il suo stile di guida è calcolato al millimetro: ogni sorpasso, ogni traiettoria, ogni frenata è frutto di una strategia lucida e ben studiata. Non è la più appariscente in pista, ma è tra le più efficaci. Difficilmente commette errori, e quando lo fa, è raro che accada due volte. Niki non lascia nulla al caso — e proprio per questo, è temuta da chiunque si trovi a correre contro di lei." },
-      { number: 9, name: "Freddie", points: 19, image: "assets/fede.jpeg", color: "#65517E", description: "Freddie è una pilota cresciuta a pane senza glutine e motori, figlia d'arte con il rombo nel sangue. Ha iniziato a correre giovanissima e ha dominato i campionati minori con talento e costanza. Dopo anni di vittorie e podi, è pronta a fare il salto tra i professionisti, dove sa che ogni curva sarà una prova di maturità. Determinata e preparata, non cerca scorciatoie: vuole guadagnarsi tutto con il lavoro, la passione e la velocità che l'hanno sempre distinta." },
-      { number: 5, name: "Monte", points: 18, image: "assets/monte.jpeg", color: "#439851", description: "Alessandro Monte(verdi) è uno dei volti più amati del paddock: simpatico, socievole, sempre pronto a scherzare e a creare un buon clima attorno a sé. Ma quando abbassa la visiera, tutto cambia. In pista diventa freddo, determinato e spietato, capace di trasformarsi in un avversario durissimo da battere. Questa doppia anima – affabile fuori, implacabile dentro – è ciò che lo rende unico e irresistibile, sia per il pubblico che per chi con lui condivide il tracciato." },
-      { number: 7, name: "Mauro", points: 63, image: "assets/mauro.jpeg", color: "#222", description: "Mauro è un pilota dal talento naturale, conosciuto per il suo stile di guida aggressivo e senza compromessi. In pista è istintivo, veloce e spesso al limite, qualità che gli hanno valso tanto ammirazione quanto critiche. Ogni gara per lui è una sfida da affrontare a viso aperto, senza paura. A volte la sua audacia lo porta a rischiare più del necessario, ma quando tutto va per il verso giusto, è capace di prestazioni straordinarie. Mauro non si accontenta di partecipare: corre per vincere, sempre." }
-    ];
+    const seasons = {
+      "2026-2027": {
+        title: "F🔥 2k27 Championship",
+        pilots: [
+          { number: 3, name: "Vix", points: 0, image: "assets/vix.jpeg", color: "#BD391F", description: "Sebbene serpeggi un po' di delusione tra chi lo chiamava il 'Predestinato', la prima stagione in campionato di Francesco Virgolini (Vix) è stata tutt'altro che deludente. L'astro nascente ha ottenuto un solidissimo terzo posto e sarebbe stato l'unico in grado di stravolgere la classifica a fine stagione se non avesse ceduto forse sotto il peso delle troppe aspettative. Il desiderio di rivalsa sarà il motore o il freno alla corsa per il titolo per il pilota che tanti sognano di vedere trionfare?" },
+          { number: 2, name: "Andy", points: 0, image: "assets/andy.jpeg", color: "#ABAAAA", description: "Andy, la vecchia gloria, ha dimostrato di avere ancora molto da dare. La sua esperienza, unita a una grinta che non si è mai spenta, lo rendono un avversario da non sottovalutare. Una stagione solida lo vede piazzarsi con un buon distacco al secondo posto, ma quest'anno è deciso più che mai a salire nuovamente sul gradino più alto del podio provando a tutti i nuovi piloti che è ancora lontano dalla pensione." },
+          { number: 14, name: "Niki", points: 0, image: "assets/niki.jpeg", color: "#F9DA44", description: "Nella stagione precedente, Niki ha avuto qualche difficoltà all'inizio ad adattarsi alla macchina. Ma non appena ha preso confidenza, il suo stile di guida ha iniziato a dare i suoi frutti. Mai un azzardo di troppo, o una curva troppo tirata, Niki è sempre dove dovrebbe essere ed è proprio così che è riuscita a salire più di una volta sul podio. Se dovesse incominciare il campionato come ha concluso quello precedente, potrà sicuramente dire la sua nella lotta per il titolo." },
+          { number: 9, name: "Freddie", points: 0, image: "assets/fede.jpeg", color: "#65517E", description: "La stagione di debutto di Freddie non ha deluso le aspettative, con la giovane pilota che sebbene un andamento un po' altalenante, ha dimostrato di avere un grande potenziale, dato vita a battaglie memorabili, e raggiunto più volte il podio sfiorando anche una prima vittoria in carriera. Dopo un anno dominante tra i piloti di centrogruppo e un costante miglioramento gara dopo gara, sarà adesso pronta a corona il suo sogno di diventare campionessa di Formula Heat?" },
+          // { number: 5, name: "Monte", points: 0, image: "assets/monte.jpeg", color: "#439851", description: "" },
+          { number: 7, name: "Mauro", points: 0, image: "assets/mauro_v2.jpeg", color: "#222", description: "Mauro corre per vincere, sempre. E nella stagione precedente il suo talento naturale, unito agli upgrade fenomenali che il suo team ha portato nel corso del campionato, gli hanno permesso di completare la stagione più dominante nella storia della Formula Heat. Veloce, istintivo, tanto che a volte nemmeno lui sa come faccia ad andare così forte, è sempre pronto ad arrivare primo, anche fosse con un sorpasso sulla linea del traguardo. Gli sponsor vogliono tutti lui, ma riuscirà a fare il bis?" }
+        ],
+        gps: [
+          { gp: "?", ranking: ["-", "-", "-", "-", "-", "-"] },
+          { gp: "?", ranking: ["-", "-", "-", "-", "-", "-"] },
+          { gp: "?", ranking: ["-", "-", "-", "-", "-", "-"] },
+          { gp: "?", ranking: ["-", "-", "-", "-", "-", "-"] },
+          { gp: "?", ranking: ["-", "-", "-", "-", "-", "-"] },
+          { gp: "?", ranking: ["-", "-", "-", "-", "-", "-"] },
+          { gp: "?", ranking: ["-", "-", "-", "-", "-", "-"] },
+          { gp: "?", ranking: ["-", "-", "-", "-", "-", "-"] }
+        ]
+      },
+      "2025-2026": {
+        title: "F🔥 2k26 Championship",
+        pilots: [
+          { number: 3, name: "Vix", points: 28, image: "assets/vix.jpeg", color: "#BD391F", description: "Vix (Francesco Virgolini) è il nome del momento nel mondo delle corse. Giovane, carismatico e incredibilmente veloce, è considerato l'astro nascente della categoria. In pista combina istinto e tecnica con una maturità sorprendente, mentre fuori dai circuiti conquista fan e addetti ai lavori con il suo stile e la sua sicurezza. Ogni gara è un'occasione per confermare il suo talento e alzare l'asticella. Per molti è già una stella; per altri, è il futuro che è già arrivato." },
+          { number: 2, name: "Andy", points: 39, image: "assets/andy.jpeg", color: "#ABAAAA", description: "Andy è un pilota esperto, con alle spalle una lunga carriera nel mondo delle corse. Dopo anni trascorsi ai vertici e momenti di grande successo, il suo percorso ha conosciuto anche fasi difficili. Nonostante non sia più sotto i riflettori come un tempo, Andy non ha mai perso la determinazione. Oggi è spinto da un unico obiettivo: tornare competitivo e dimostrare di avere ancora molto da dare. La sua esperienza, unita a una grinta che non si è mai spenta, lo rende un avversario da non sottovalutare." },
+          { number: 14, name: "Niki", points: 19, image: "assets/niki.jpeg", color: "#F9DA44", description: "Niki è una pilota dal sangue freddo, precisa e implacabile. Il suo stile di guida è calcolato al millimetro: ogni sorpasso, ogni traiettoria, ogni frenata è frutto di una strategia lucida e ben studiata. Non è la più appariscente in pista, ma è tra le più efficaci. Difficilmente commette errori, e quando lo fa, è raro che accada due volte. Niki non lascia nulla al caso — e proprio per questo, è temuta da chiunque si trovi a correre contro di lei." },
+          { number: 9, name: "Freddie", points: 22, image: "assets/fede.jpeg", color: "#65517E", description: "Freddie è una pilota cresciuta a pane senza glutine e motori, figlia d'arte con il rombo nel sangue. Ha iniziato a correre giovanissima e ha dominato i campionati minori con talento e costanza. Dopo anni di vittorie e podi, è pronta a fare il salto tra i professionisti, dove sa che ogni curva sarà una prova di maturità. Determinata e preparata, non cerca scorciatoie: vuole guadagnarsi tutto con il lavoro, la passione e la velocità che l'hanno sempre distinta." },
+          { number: 5, name: "Monte", points: 20, image: "assets/monte.jpeg", color: "#439851", description: "Alessandro Monte(verdi) è uno dei volti più amati del paddock: simpatico, socievole, sempre pronto a scherzare e a creare un buon clima attorno a sé. Ma quando abbassa la visiera, tutto cambia. In pista diventa freddo, determinato e spietato, capace di trasformarsi in un avversario durissimo da battere. Questa doppia anima – affabile fuori, implacabile dentro – è ciò che lo rende unico e irresistibile, sia per il pubblico che per chi con lui condivide il tracciato." },
+          { number: 7, name: "Mauro", points: 72, image: "assets/mauro.jpeg", color: "#222", description: "Mauro è un pilota dal talento naturale, conosciuto per il suo stile di guida aggressivo e senza compromessi. In pista è istintivo, veloce e spesso al limite, qualità che gli hanno valso tanto ammirazione quanto critiche. Ogni gara per lui è una sfida da affrontare a viso aperto, senza paura. A volte la sua audacia lo porta a rischiare più del necessario, ma quando tutto va per il verso giusto, è capace di prestazioni straordinarie. Mauro non si accontenta di partecipare: corre per vincere, sempre." }
+        ],
+        gps: [
+          { gp: "USA", ranking: ["Mauro", "Monte", "Andy", "Freddie", "Vix", "Niki"] },
+          { gp: "Mexico", ranking: ["Mauro", "Andy", "Vix", "Freddie", "Monte", "Niki"] },
+          { gp: "Netherland", ranking: ["Mauro", "Andy", "Freddie", "Vix", "Niki", "Monte"] },
+          { gp: "France", ranking: ["Mauro", "Andy", "Vix", "Monte", "Niki", "Freddie"] },
+          { gp: "Japan", ranking: ["Mauro", "Freddie", "Vix", "Andy", "Niki", "Monte"] },
+          { gp: "UK", ranking: ["Mauro", "Vix", "Niki", "Monte", "Andy", "Freddie"] },
+          { gp: "Spain", ranking: ["Mauro", "Andy", "Vix", "Niki", "Monte", "Freddie"] },
+          { gp: "Italy", ranking: ["Mauro", "Andy", "Niki", "Freddie", "Monte", "Vix"] }
+        ]
+      }
+    };
 
-    const gps = [
-      { gp: "USA", ranking: ["Mauro", "Monte", "Andy", "Freddie", "Vix", "Niki"] },
-      { gp: "Mexico", ranking: ["Mauro", "Andy", "Vix", "Freddie", "Monte", "Niki"] },
-      { gp: "Netherland", ranking: ["Mauro", "Andy", "Freddie", "Vix", "Niki", "Monte"] },
-      { gp: "France", ranking: ["Mauro", "Andy", "Vix", "Monte", "Niki", "Freddie"] },
-      { gp: "Japan", ranking: ["Mauro", "Freddie", "Vix", "Andy", "Niki", "Monte"] },
-      { gp: "UK", ranking: ["Mauro", "Vix", "Niki", "Monte", "Andy", "Freddie"] },
-      { gp: "Spain", ranking: ["Mauro", "Andy", "Vix", "Niki", "Monte", "Freddie"] },
-      { gp: "Italy", ranking: ["-", "-", "-", "-", "-", "-"] }
-    ];
-
-    // Sort pilots by points descending
-    const sortedPilots = [...pilots].sort((a, b) => {
-      return b.points - a.points;
-    });
-
-    // Populate Carousel
     const carouselSlides = document.getElementById("carouselSlides");
     const carouselDots = document.getElementById("carouselDots");
     const rankingList = document.getElementById("rankingList");
-
-    sortedPilots.forEach((pilot, i) => {
-      const slide = document.createElement("div");
-      slide.className = `carousel-slide${i === 0 ? " active" : ""}`;
-      slide.innerHTML = `
-        <div class="carousel-card" onclick="handleFlip(this)">
-          <div class="carousel-face">
-            <img src="${pilot.image}" alt="${pilot.name}" />
-            <div class="carousel-text">
-              <h2>${pilot.name}</h2>
-              <p>${pilot.description}</p>
-            </div>
-          </div>
-          <div class="carousel-back">
-            <h2>${pilot.name}</h2>
-            <p>${pilot.description}</p>
-          </div>
-        </div>
-      `;
-      carouselSlides.appendChild(slide);
-
-      const dot = document.createElement("span");
-      dot.className = `dot${i === 0 ? " active" : ""}`;
-      dot.addEventListener("click", () => showSlide(i));
-      carouselDots.appendChild(dot);
-
-      const row = document.createElement("div");
-      row.className = "ranking-item";
-      row.style.backgroundColor = pilot.color;
-      row.innerHTML = `<span>${pilot.number}</span><span>${pilot.name}</span><span>${pilot.points}</span>`;
-      rankingList.appendChild(row);
-    });
+    const gpWrapper = document.getElementById("gpCarouselWrapper");
+    const seasonTitle = document.getElementById("seasonTitle");
+    const yearButtons = Array.from(document.querySelectorAll(".year-button"));
 
     let currentSlide = 0;
-    const slides = document.querySelectorAll(".carousel-slide");
-    const dots = document.querySelectorAll(".carousel-dots .dot");
+    let carouselTimer = null;
+    let slides = [];
+    let dots = [];
+
+    function sortPilots(pilots) {
+      return [...pilots].sort((a, b) => b.points - a.points);
+    }
 
     function showSlide(i) {
       slides.forEach((slide, idx) => {
@@ -414,32 +437,94 @@
       currentSlide = i;
     }
 
-    setInterval(() => {
-      currentSlide = (currentSlide + 1) % slides.length;
-      showSlide(currentSlide);
-    }, 10000);
-
     function handleFlip(card) {
       if (window.innerWidth <= 600) {
         card.classList.toggle("flipped");
       }
     }
 
-    const gpWrapper = document.getElementById("gpCarouselWrapper");
+    function renderSeason(seasonKey) {
+      const season = seasons[seasonKey];
+      if (!season) return;
 
-    gps.forEach(gp => {
-      const div = document.createElement("div");
-      div.className = "gp-carousel-slide";
+      seasonTitle.textContent = season.title;
+      carouselSlides.innerHTML = "";
+      carouselDots.innerHTML = "";
+      rankingList.innerHTML = "";
+      gpWrapper.innerHTML = "";
+      slides = [];
+      dots = [];
+      clearInterval(carouselTimer);
 
-      let html = `<div class="gp-title">${gp.gp} GP</div>`;
-      gp.ranking.forEach((name, i) => {
-        const medal = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
-        html += `<div class="gp-ranking-item ${medal}"><span>${i + 1}</span><span>${name}</span><span></span></div>`;
+      const sortedPilots = sortPilots(season.pilots);
+
+      sortedPilots.forEach((pilot, i) => {
+        const slide = document.createElement("div");
+        slide.className = `carousel-slide${i === 0 ? " active" : ""}`;
+        slide.innerHTML = `
+          <div class="carousel-card" onclick="handleFlip(this)">
+            <div class="carousel-face">
+              <img src="${pilot.image}" alt="${pilot.name}" />
+              <div class="carousel-text">
+                <h2>${pilot.name}</h2>
+                <p>${pilot.description}</p>
+              </div>
+            </div>
+            <div class="carousel-back">
+              <h2>${pilot.name}</h2>
+              <p>${pilot.description}</p>
+            </div>
+          </div>
+        `;
+        carouselSlides.appendChild(slide);
+
+        const dot = document.createElement("span");
+        dot.className = `dot${i === 0 ? " active" : ""}`;
+        dot.addEventListener("click", () => showSlide(i));
+        carouselDots.appendChild(dot);
+
+        const row = document.createElement("div");
+        row.className = "ranking-item";
+        row.style.backgroundColor = pilot.color;
+        row.innerHTML = `<span>${pilot.number}</span><span>${pilot.name}</span><span>${pilot.points}</span>`;
+        rankingList.appendChild(row);
       });
 
-      div.innerHTML = html;
-      gpWrapper.appendChild(div);
+      slides = Array.from(document.querySelectorAll(".carousel-slide"));
+      dots = Array.from(document.querySelectorAll(".carousel-dots .dot"));
+
+      if (slides.length) {
+        showSlide(0);
+        carouselTimer = setInterval(() => {
+          currentSlide = (currentSlide + 1) % slides.length;
+          showSlide(currentSlide);
+        }, 10000);
+      }
+
+      season.gps.forEach(gp => {
+        const div = document.createElement("div");
+        div.className = "gp-carousel-slide";
+
+        let html = `<div class="gp-title">${gp.gp} GP</div>`;
+        gp.ranking.forEach((name, i) => {
+          const medal = i === 0 ? "gold" : i === 1 ? "silver" : i === 2 ? "bronze" : "";
+          html += `<div class="gp-ranking-item ${medal}"><span>${i + 1}</span><span>${name}</span><span></span></div>`;
+        });
+
+        div.innerHTML = html;
+        gpWrapper.appendChild(div);
+      });
+
+      yearButtons.forEach(button => {
+        button.classList.toggle("active", button.dataset.year === seasonKey);
+      });
+    }
+
+    yearButtons.forEach(button => {
+      button.addEventListener("click", () => renderSeason(button.dataset.year));
     });
+
+    renderSeason("2026-2027");
   </script>
 </body>
 </html>
